@@ -4,8 +4,8 @@ This repository contains source code for shellcode which is capable of bypassing
 I wanted to learn more about these mitigations and I couldn't find much info related to this, so here we go, I hope somebody will find this useful aswell. 
 _This repo is for educational purposes only_
 
-**Also you can find here an approach to shellcode compilation in C using MSVC's compiler, linker and assembler.
-**
+**Also you can find here an approach to shellcode compilation in C using MSVC's compiler, linker and assembler.**
+
 *Both x64 and x86 shellcodes are supported.*
 
 Shellcode was tested on `22621.1.amd64fre.ni_release.220506-1250`, `19041.1.amd64fre.vb_release.191206-1406` and `W8.1 Pro 6.3.9600 Build 9600 with EMET applied`
