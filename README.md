@@ -208,6 +208,13 @@ And this is essentially all, since the string itself is not being checked - this
 #### x86
 In 32bit version we need to make sure, that there isn't invalid `ebp` register. If there is, EAF+ will terminate the process.
 
+### DOS header EAF+ bypass
+During my testing I couldn't get the DOS header protection to trigger. However if this was the case, we could very easily bypass this.
+
+Instead of parsing the DOS header, we could hardcode $$module+0x1000$$ into our lookup function to get `.text` section of the module. 
+
+This way we could still find the gadgets and use them afterwards for accessing the header etc.
+
 ### HookIATFunction gadget version
 
 First you need to parse IAT and loop through it. Once again this is well known and you can use any public made IAT lookup function. I used [this](https://www.ired.team/offensive-security/code-injection-process-injection/import-adress-table-iat-hooking) because it's one of the first things that I found.
