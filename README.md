@@ -65,7 +65,8 @@ Based on [this ETW research](https://github.com/palantir/exploitguard) EAF shoul
 2. check stack registers which could fall outside the stack memory of current thread (EAF+) - observed only in x86 version
 3. check that a memory reading gadget is used for accessing the memory (EAF+) - sadly not observed.
 
-I am not sure why the last one wasn't triggered at all, I suppose it was removed. 
+I am not sure why the last one wasn't triggered at all, I suppose it was removed.
+
 EDIT: Actually [I've found out the reason](https://big5-sec.github.io/posts/inside-import-address-filtering/)
 
 ## IAF
@@ -383,6 +384,7 @@ These are not really high target mitigations and Microsoft sees that aswell, bec
 If you want to use the EAF mitigation then enable it in EAF+ version aswell. It might not seem that useful, but the base / stack register check could come very handy in real exploit where running shellcode might not be possible. Bypassing this using rop chains with pivot to the heap might stop the attacker - had to be in the situation to be completely sure about this one (perhaps next project).
 
 Sadly I couldn't trigger the 3rd ETW event which might've changed my approach to this completely.
+
 EDIT: Thanks to the [reversing done](https://big5-sec.github.io/posts/inside-import-address-filtering/) by yar-eb I now know why it didn't trigger at all.
 Most of the gadgets used are not inside the blacklisted gadgets. Only these should trigger EAF+ :
 ```
