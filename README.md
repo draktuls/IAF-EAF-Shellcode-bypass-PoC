@@ -97,7 +97,7 @@ mov rax, qword ptr [rax + 0x17b8] ; ret
 mov rax, qword ptr [rax + 0x17c0] ; ret
 mov rax, qword ptr [rax + 0x38] ; ret
 mov rax, qword ptr [rax + 0x60] ; ret
-mov rax, qword ptr [rax] ; ret
+mov rax, qword ptr [rax] ; ret // blacklisted by EAF+
 ```
 
 They will do all the hardwork of reading the protected memory and return to our shellcode afterwards. I found that these gadgets were present in a lot of modules in one form or another.
@@ -108,7 +108,7 @@ Fear not there are equivalents in dword versions aswell:
 ```assembly
 mov eax, dword ptr [eax + 0x14] ; ret // 8b4014c3
 mov eax, dword ptr [eax + 0x16b0] ; ret // 8b80b0160000c3
-mov eax, dword ptr [eax] ; ret // 8b00c3
+mov eax, dword ptr [eax] ; ret // 8b00c3 // blacklisted by EAF+
 ```
 
 EDIT: Caution the last gadget without any offset might trigger the EAF+
@@ -159,11 +159,11 @@ Well if we have a look at the gadgets used:
 ```assembly
 mov rax, qword ptr [rax + 0x16a8] ; ret
 mov rax, qword ptr [rax + 0x60] ; ret
-mov rax, qword ptr [rax] ; ret
+mov rax, qword ptr [rax] ; ret // blacklisted by EAF+
 -------------------------------
 mov eax, dword ptr [eax + 0x14] ; ret // 8b4014c3
 mov eax, dword ptr [eax + 0x16b0] ; ret // 8b80b0160000c3
-mov eax, dword ptr [eax] ; ret // 8b00c3
+mov eax, dword ptr [eax] ; ret // 8b00c3 // blacklisted by EAF+
 ```
 *There are also [eax - 0x8] etc. ones.*
 
