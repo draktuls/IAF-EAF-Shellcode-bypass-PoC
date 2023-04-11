@@ -65,7 +65,8 @@ Based on [this ETW research](https://github.com/palantir/exploitguard) EAF shoul
 2. check stack registers which could fall outside the stack memory of current thread (EAF+) - observed only in x86 version
 3. check that a memory reading gadget is used for accessing the memory (EAF+) - sadly not observed.
 
-I am not sure why the last one wasn't triggered at all, I suppose it was removed.
+I am not sure why the last one wasn't triggered at all, I suppose it was removed. 
+EDIT: Actually [I've found out the reason](https://big5-sec.github.io/posts/inside-import-address-filtering/)
 
 ## IAF
 This mitigation works like EAF by applying *PAGE_GUARD* protection, but on all Import Address Tables. However it only checks for [certain critical APIs](https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/exploit-protection-reference?view=o365-worldwide#import-address-filtering-iaf) which are often used in exploitation. This mitigation mainly exists because shellcodes/exploits might replace IAT functions to redirect execution - EAF on the other hand is supposed to make finding the important API functions impossible/hard.
@@ -108,6 +109,8 @@ mov eax, dword ptr [eax + 0x14] ; ret // 8b4014c3
 mov eax, dword ptr [eax + 0x16b0] ; ret // 8b80b0160000c3
 mov eax, dword ptr [eax] ; ret // 8b00c3
 ```
+
+EDIT: Caution the last gadget without any offset might trigger the EAF+
 
 ### IAF only
 The mitigation itself doesn't revolve around reading pointers to critical APIs, it's main use is to block IAT hijacking. However the way it's implemented is that the buffer of the IAT API is subject to the protection - we can walk the IAT all day long without getting the function name.
@@ -370,6 +373,8 @@ I would like to thank [hasherezade](https://github.com/hasherezade) for the awes
 
 And [palantir](https://github.com/palantir) for the [ETW reference](https://github.com/palantir/exploitguard).
 
+EDIT: And also [yar-eb](https://big5-sec.github.io/) for [full reversing of these mitigations](https://big5-sec.github.io/posts/inside-import-address-filtering/) (I was not aware of this before)
+
 ## Conclusion
 
 EAF and IAF mitigations might slow down the development of exploit for attackers, but they are probably not gonna stop them completely.
@@ -378,3 +383,9 @@ These are not really high target mitigations and Microsoft sees that aswell, bec
 If you want to use the EAF mitigation then enable it in EAF+ version aswell. It might not seem that useful, but the base / stack register check could come very handy in real exploit where running shellcode might not be possible. Bypassing this using rop chains with pivot to the heap might stop the attacker - had to be in the situation to be completely sure about this one (perhaps next project).
 
 Sadly I couldn't trigger the 3rd ETW event which might've changed my approach to this completely.
+EDIT: Thanks to the [reversing done](https://big5-sec.github.io/posts/inside-import-address-filtering/) by yar-eb I now know why it didn't trigger at all.
+Most of the gadgets used are not inside the blacklisted gadgets. Only these should trigger EAF+ :
+```
+mov <register>, [ <register> ]
+```
+I might update the source soon or just remove the first option during the search
