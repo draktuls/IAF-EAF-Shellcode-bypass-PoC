@@ -387,7 +387,9 @@ Sadly I couldn't trigger the 3rd ETW event which might've changed my approach to
 
 EDIT: Thanks to the [reversing done](https://big5-sec.github.io/posts/inside-import-address-filtering/) by yar-eb I now know why it didn't trigger at all.
 Most of the gadgets used are not inside the blacklisted gadgets. Only these should trigger EAF+ :
+
 ```
 mov <register>, [ <register> ]
 ```
-I might update the source soon or just remove the first option during the search
+
+The blacklisted gadget is now removed from the code - it should work as intended now :).
